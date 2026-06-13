@@ -9,7 +9,7 @@ from typing import Annotated
 
 sys.path.insert(0, "./src")  # this is bad - must be removed
 from bumbufile.core import FileProcessingError, FileProcessing
-from bumbufile.console import progress
+from bumbufile.console import progress, print_dict_as_table, print_error
 
 app = typer.Typer()
 
@@ -56,8 +56,26 @@ def resize_image(
                 new_image_path=resized_image_path,
             )
     except FileProcessingError as exc:
-        raise exc
-        print(f"Error occurred: {exc}")  # use rich of course
+        print_error(f"Error occurred: {exc}")
+
+@app.command(
+    name="get-metadata",
+    help="Get metadata about the file",
+)
+def get_file_metadata(
+    file: str = typer.Argument(
+        help = "Path on the filesystem to the file to get the metadata of"
+    ),
+):
+    try:
+       print_dict_as_table(
+           table_title="File metadata",  # I need to work on these names
+           key_column_name="Key",
+           value_column_name="Value",
+           source=FileProcessing.get_file_metadata(file),
+       )
+    except FileProcessingError as exc:
+        print_error(f"Error occurred: {exc}")
 
 @app.command(
     name="--web",
