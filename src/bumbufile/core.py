@@ -14,7 +14,7 @@ class FileProcessingError(Exception):
 class FileProcessing:
     @staticmethod
     def validate_file(filename: str | Path) -> None:
-        path = Path(filename) if isinstance(filename, str) else filename
+        path = Path(filename)
         if not path.exists():
             raise FileProcessingError(f'File "{filename}" does not exist')
         if not path.is_file():
@@ -27,11 +27,11 @@ class FileProcessing:
     @staticmethod
     def get_new_filename(filename: str | Path) -> str:
         # assume file is already validated
-        path = Path(filename) if isinstance(filename, str) else filename
+        path = Path(filename)
         return str(path.parent.absolute() / f"processed-{path.name}")
 
     @staticmethod
-    def resize_image(image_path: str, width: int, height: int, new_image_path: str | None = None) -> None:
+    def resize_image(image_path: str | Path, width: int, height: int, new_image_path: str | None = None) -> None:
         path = Path(image_path)
         FileProcessing.validate_file(path)
         try:
@@ -42,6 +42,16 @@ class FileProcessing:
             )
         except OSError as exc:
             raise FileProcessingError("Error occurred during image resizing") from exc
+
+    @staticmethod
+    def display_image(image_path: str | Path) -> None:
+        FileProcessing.validate_file(image_path)
+        try:
+            # TODO: try to write your own or use some existing gui library
+           with Image.open(image_path) as img:
+              img.show()
+        except OSError as exc:
+            raise FileProcessingError(f'Failed to display image "{image_path}"') from exc
 
     @staticmethod
     def get_file_metadata(filename: str | Path) -> dict:
@@ -60,4 +70,6 @@ class FileProcessing:
 if __name__ == "__main__":
     image_path = "data/shuttle.jpg"
     path = Path(image_path)
+    print(path)
+    print(Path(path))
     print(FileProcessing.get_file_metadata(image_path))

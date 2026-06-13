@@ -78,6 +78,20 @@ def get_file_metadata(
         print_error(f"Error occurred: {exc}")
 
 @app.command(
+    name="display-image",
+    help="Display image if the operating system allows it",
+)
+def display_image(
+    image_path: str = typer.Argument(
+        help = "Path on the filesystem to the image to be resized"
+    ),
+):
+    try:
+        FileProcessing.display_image(image_path)
+    except FileProcessingError as exc:
+        print_error(f"Failed to display an image: {exc}")
+
+@app.command(
     name="--web",
     help="Launch web interface to perform all the file operations in the browser",
 )
